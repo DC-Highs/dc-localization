@@ -1,60 +1,10 @@
-import { ConfigLanguage } from "@dchighs/dc-core"
 import axios from "axios"
 
-export type LocalizatioLanguage = ConfigLanguage | `${ConfigLanguage}`
-
-export type LocalizationOptions = {
-    language: LocalizatioLanguage
-    data: Record<string, string>
-}
-
-export type LocalizationData = Record<string, string>
-
-export type LocalizationArrayData = Array<LocalizationData>
-
-export type ComparisonResultNewField = {
-    key: string
-    value: string
-}
-
-export type ComparisonResultEditedFieldValues = {
-    old: string
-    new: string
-}
-
-export type ComparisonResultEditedField = {
-    key: string
-    values: ComparisonResultEditedFieldValues
-}
-
-export type ComparisonResultDeletedField = {
-    key: string
-    value: string
-}
-
-export type ComparisonResult = {
-    newFields: ComparisonResultNewField[]
-    editedFields: ComparisonResultEditedField[]
-    deletedFields: ComparisonResultDeletedField[]
-}
-
-export type QueryfyStringOptions = {
-    text: string
-    lowerCase?: boolean
-    normalizeLetters?: boolean
-    trimSpaces?: boolean
-}
-
-export type SearchKeysOptions = {
-    query: string
-} & Omit<QueryfyStringOptions, "text">
-
-export type SearchValuesOptions = {
-    query: string
-} & Omit<QueryfyStringOptions, "text">
+import { ComparisonResult, ComparisonResultDeletedField, ComparisonResultEditedField, ComparisonResultNewField, LocalizationArrayData, LocalizationData, LocalizationLanguage, LocalizationOptions, NormalizeTextOptions, SearchKeysOptions, SearchValuesOptions, Translated } from "./types"
+import { descriptionKeysToTranslate, nameKeysToTranslate, typeNameKeysToTranslate } from "./utils"
 
 export class Localization {
-    readonly language: LocalizatioLanguage
+    readonly language: LocalizationLanguage
     readonly url: string
     readonly data: Record<string, string>
 
@@ -64,17 +14,17 @@ export class Localization {
         this.data = data
     }
 
-    static buildUrl(language: LocalizatioLanguage): string {
+    static buildUrl(language: LocalizationLanguage): string {
         return `https://sp-translations.socialpointgames.com/deploy/dc/android/prod/dc_android_${language}_prod_wetd46pWuR8J5CmS.json`
     }
 
-    static async fetch(language: LocalizatioLanguage): Promise<LocalizationArrayData> {
+    static async fetch(language: LocalizationLanguage): Promise<LocalizationArrayData> {
         const response = await axios.get(Localization.buildUrl(language))
         const data = response.data
         return data
     }
 
-    static async create(language: LocalizatioLanguage) {
+    static async create(language: LocalizationLanguage) {
         const arrayData = await Localization.fetch(language)
         const data = Object.assign({}, ...arrayData)
 
@@ -123,7 +73,7 @@ export class Localization {
         lowerCase = true,
         normalizeLetters = true,
         trimSpaces = true
-    }: QueryfyStringOptions): string {
+    }: NormalizeTextOptions): string {
         let result = text
 
         if (lowerCase) result = result.toLowerCase()
@@ -251,18 +201,18 @@ export class Localization {
         return Localization.compare(this, other)
     }
 
-    translate<T extends Record<string, any>>(object: T): T {
+    translate<T extends Record<string, any>>(object: T): Translated<T> {
         const translatedObject: Record<string, any> = {...object}
 
         for (const key in translatedObject) {
-            if (["tid_name", "chest_name_key", "name_key", "island_title_tid"].includes(key)) {
+            if (nameKeysToTranslate.includes(key as any)) {
                 const name = this.getValueFromKey(object[key])
 
                 if (name) {
                     translatedObject.name = name
                     delete translatedObject[key]
                 }
-            } else if (key === "type_name_key") {
+            } else if (typeNameKeysToTranslate.includes(key as any)) {
                 const typeName = this.getValueFromKey(object[key])
 
                 if (typeName) {
@@ -271,7 +221,7 @@ export class Localization {
                 }
             }
 
-            if (key === "description_key") {
+            if (descriptionKeysToTranslate.includes(key as any)) {
                 const description = this.getValueFromKey(object[key])
 
                 if (description) {
@@ -279,14 +229,8 @@ export class Localization {
                     delete translatedObject[key]
                 }
             }
-
-            if (key === "group_type" && translatedObject.group_type === "DRAGON") {
-                const dragonId = translatedObject.id as number
-                translatedObject.name = this.getDragonName(dragonId)
-                translatedObject.description = this.getDragonDescription(dragonId)
-            }
         }
 
-        return translatedObject as T
+        return translatedObject as Translated<T>
     }
 }
