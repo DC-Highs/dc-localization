@@ -1,6 +1,6 @@
 {
   "name": "@dchighs/dc-localization",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A library to handle localization for Dragon City.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
