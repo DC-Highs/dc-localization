@@ -55,12 +55,12 @@ export type SearchValuesOptions = {
 
 type FinalName<T> = T extends { name: infer N } ? { name: N } : { name?: string }
 
-type FinalType<T> = T extends { type: infer Ty } ? { type: Ty } : { type?: string }
+type FinalType<T> = T extends { type_name: infer Ty } ? { type_name: Ty } : { type_name?: string }
 
 type FinalDescription<T> = T extends { description: infer D } ? { description: D } : { description?: string }
 
 export type Translated<T> =
-    Omit<T, TranslatableKeys | "name" | "type" | "description">
+    Omit<T, TranslatableKeys | "name" | "type_name" | "description">
     & FinalName<T>
     & FinalType<T>
     & FinalDescription<T>

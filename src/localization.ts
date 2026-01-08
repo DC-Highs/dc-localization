@@ -216,7 +216,7 @@ export class Localization {
                 const typeName = this.getValueFromKey(object[key])
 
                 if (typeName) {
-                    translatedObject.type = typeName
+                    translatedObject.type_name = typeName
                     delete translatedObject[key]
                 }
             }
