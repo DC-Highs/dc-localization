@@ -30,6 +30,6 @@
     "axios": "^1.13.2"
   },
   "peerDependencies": {
-    "@dchighs/dc-core": "^0.0.2"
+    "@dchighs/dc-core": "^0.1.0"
   }
 }
