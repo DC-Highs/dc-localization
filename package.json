@@ -1,6 +1,6 @@
 {
   "name": "@dchighs/dc-localization",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A library to handle localization for Dragon City.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -30,6 +30,6 @@
     "axios": "^1.13.2"
   },
   "peerDependencies": {
-    "@dchighs/dc-core": "^0.3.0"
+    "@dchighs/dc-core": "^0.4.2"
   }
 }
